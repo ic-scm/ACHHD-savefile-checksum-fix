@@ -13,3 +13,4 @@ This program is based on the `/core/source/utils/checksum.cpp` file from [Happy-
 The software is licensed under the GNU General Public License, see the LICENSE file for more information.
 
 The provided software comes with NO WARRANTY. Always have a backup of the unmodified save file. Unexpected things can happen to your game if you use this program to fix a corrupted or hand-edited save file. Use at your own risk.
+The program does not in any way verify the validity of the actual data in the save file.

@@ -37,6 +37,10 @@
 #include <fstream>
 
 
+//Expected file size of the takumi.dat file (in bytes).
+#define TAKUMI_SIZE 2877760
+
+
 //Function from openrevolution utils.h
 //Returns integer as big endian bytes
 //TODO: Improve the speed of this function and brstm_encoder_getByteInt16
@@ -185,11 +189,17 @@ int main(int argc, char** argv) {
 	}
 	
 	uint8_t* bin;
+	bin = new uint8_t[TAKUMI_SIZE];
+	memset(bin, 0, TAKUMI_SIZE);
 	std::streampos size;
 	std::ifstream file (argv[1], std::ios::in|std::ios::binary|std::ios::ate);
 	if(file.is_open()) {
 		size = file.tellg();
-		bin = new uint8_t[size];
+		if(size < TAKUMI_SIZE) printf("WARNING: The file \'%s\' is too small: %u bytes, expected %u bytes. Is this a takumi.dat file?\n\n", argv[1], (uint32_t)size, TAKUMI_SIZE);
+		if(size > TAKUMI_SIZE) {
+			printf("WARNING: The file \'%s\' is too large: %u bytes, expected %u bytes. Is this a takumi.dat file?\n\n", argv[1], (uint32_t)size, TAKUMI_SIZE);
+			size = TAKUMI_SIZE;
+		}
 		file.seekg(0, std::ios::beg);
 		file.read((char*)bin, size);
 		file.close();
@@ -208,15 +218,17 @@ int main(int argc, char** argv) {
 	if(changed) {
 		std::ofstream ofile (ofilename, std::ios::out|std::ios::binary|std::ios::trunc);
 		if(ofile.is_open()) {
-			ofile.write((char*)bin, size);
+			ofile.write((char*)bin, TAKUMI_SIZE);
 			ofile.close();
 		}
 		else {printf("Failed to write file %s\n",ofilename); exit(1);}
 		
 		printf("Fixed file is saved as %s\n", ofilename);
 	} else {
-		printf("There was no change\n");
+		printf("There was no change. The checksums in this file are already valid.\n");
 	}
+	
+	delete[] bin;
 	
 	return 0;
 }
